@@ -55,6 +55,8 @@
       <workItem from="1721391834071" duration="311000" />
       <workItem from="1733610725674" duration="16000" />
       <workItem from="1733612067614" duration="7954000" />
+      <workItem from="1733641919897" duration="9202000" />
+      <workItem from="1733652884340" duration="3147000" />
     </task>
     <servers />
   </component>
@@ -62,10 +64,21 @@
     <option name="version" value="3" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/nl/mpdev/Main.java</url>
+          <line>131</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="currentLine.charAt(test + 1)" />
         <watch expression="nextChar" />
+        <watch expression="i" />
+        <watch expression="fourthLetter" />
       </configuration>
     </watches-manager>
   </component>

@@ -12,14 +12,15 @@ public class Main {
 
     File puzzle = new File("./puzzle.txt");
     var arr = createArr(puzzle);
-    searchToTheRight(arr);
-    searchToTheLeft(arr);
-    searchToBottom(arr);
-    searchToTop(arr);
-    seachDiagonalBottomLeft(arr);
-    seachDiagonalBottomRight(arr);
-    seachDiagonalTopLeft(arr);
-    searchDiagonalTopRight(arr);
+//    searchToTheRight(arr);
+//    searchToTheLeft(arr);
+//    searchToBottom(arr);
+//    searchToTop(arr);
+//    seachDiagonalBottomLeft(arr);
+//    seachDiagonalBottomRight(arr);
+//    seachDiagonalTopLeft(arr);
+//    searchDiagonalTopRight(arr);
+    searchTheX(arr);
     System.out.println(counter);
   }
 
@@ -124,6 +125,40 @@ public class Main {
         char fourthLetter = arr.get(i - 3).charAt(j + 3);
         validateLetter(firstLetter, secondLetter, tirthLetter, fourthLetter);
       }
+    }
+  }
+
+  private static void searchTheX(ArrayList<String> arr) {
+    for (int i = 0; i < arr.size() - 2; i++) {
+      var currentLine = arr.get(i);
+      for (int j = 0; j < currentLine.length() - 2; j++) {
+        char firstLetter = currentLine.charAt(j); // current line
+        char secondLetter = arr.get(i + 1).charAt(j + 1);
+        char tirthLetter = arr.get(i + 2).charAt(j + 2);
+        char fourthLetter = arr.get(i + 2).charAt(j);
+        char fiftLetter = arr.get(i + 1).charAt(j + 1);
+        char sixLetter = arr.get(i).charAt(j + 2);
+        validateLetter(firstLetter, secondLetter, tirthLetter, fourthLetter, fiftLetter, sixLetter, i, j);
+      }
+    }
+  }
+
+  private static void validateLetter(char firstLetter, char secondLetter, char tirthLetter, char fourthLetter, char fiftLetter,
+                                     char sixtLetter, int currentLine, int position) {
+    int insidecount = 0;
+    if ((firstLetter == 'S' && secondLetter == 'A' &&  tirthLetter == 'M') || firstLetter == 'M'  && secondLetter == 'A' &&  tirthLetter == 'S') {
+      insidecount++;
+
+    }
+    if ((fourthLetter == 'S' && fiftLetter == 'A' &&  sixtLetter == 'M') || fourthLetter == 'M'  && fiftLetter == 'A' &&  sixtLetter == 'S') {
+      insidecount++;
+    }
+    if (insidecount == 2) {
+//      System.out.println(currentLine + 1);
+//      System.out.println("Top-left-to-bottom-right diagonal match at " + firstLetter + secondLetter + tirthLetter);
+//      System.out.println("Bottom-left-to-top-right diagonal match: " + fourthLetter + fiftLetter + sixtLetter);
+      counter++;
+//      System.out.println("Full X match found! Incremented counter.");
     }
   }
 
