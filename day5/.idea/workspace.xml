@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4cd1449-94b7-4ebf-b6a3-acb3b969afb5" name="Changes" comment="" />
+    <list default="true" id="e4cd1449-94b7-4ebf-b6a3-acb3b969afb5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../day4/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../day4/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -26,7 +28,7 @@
   "keyToString": {
     "Application.Main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "day5",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -55,7 +57,8 @@
       <workItem from="1721391834071" duration="311000" />
       <workItem from="1734259407005" duration="5000" />
       <workItem from="1734259556113" duration="92000" />
-      <workItem from="1734259732554" duration="2284000" />
+      <workItem from="1734259732554" duration="2647000" />
+      <workItem from="1734264280571" duration="5296000" />
     </task>
     <servers />
   </component>
