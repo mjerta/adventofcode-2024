@@ -5,11 +5,12 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Main {
+
   public static void main(String[] args) {
 
     File orderingPuzzle = new File("./ordering-puzzle.txt");
     File puzzle = new File("./puzzle.txt");
-    boolean stateOfLine = false;
+    int finalResult = 0;
 
     // Make a hashmap out of ordering list
     // Split out ordering-puzzle and add to the hashmap
@@ -20,10 +21,23 @@ public class Main {
 //    printOutArray(creatOrderingArr(puzzle, ","));
     //  Make the first function to follow the logic of puzzle and filter them itno a new list
 
-    filterOuterArray(test1, test2);
+    var results = filterArray(test1, test2);
 
+    for (List<Integer> result : results) {
+      int middleIndex = result.size() / 2; // Calculate the middle index
 
-
+      if (result.size() % 2 == 0) {
+        // If even size, return the average of the two middle numbers
+        var add = result.get(middleIndex - 1) + result.get(middleIndex) / 2;
+        finalResult += add;
+      }
+      else {
+        // If odd size, return the middle element
+        var add = result.get(middleIndex);
+        finalResult += add;
+      }
+    }
+    System.out.println(finalResult);
 
     // Create a function to get the the middle of each of this result and add them to an output variable
 
@@ -57,18 +71,32 @@ public class Main {
     }
   }
 
-  public static void filterOuterArray(List<List<Integer>> filterPuzzle, List<List<Integer>> puzzle) {
-    for (List<Integer> innerlist : puzzle) {
-      for (int i = 0; i < innerlist.size(); i++) {
-
-        // LOOP OUT FILTERPUZZLE
-        System.out.println(innerlist.get(i));
+  public static List<List<Integer>> filterArray(List<List<Integer>> filterPuzzle, List<List<Integer>> puzzle) {
+    List<List<Integer>> returnList = new ArrayList<>();
+    for (List<Integer> puzzleList : puzzle) {
+      boolean isValid = true;
+      for (int i = 0; i < puzzleList.size() - 1; i++) {
+        int count = 0;
+        var nextNumber = puzzleList.get(i + 1);
+        for (List<Integer> rules : filterPuzzle) {
+          for (int j = 0; j < rules.size(); j += 2) {
+            if (Objects.equals(puzzleList.get(i), rules.get(j)) && Objects.equals(nextNumber, rules.get(j + 1))) {
+              continue;
+            }
+            if (Objects.equals(puzzleList.get(i), rules.get(j + 1)) && Objects.equals(nextNumber, rules.get(j))) {
+              isValid = false;
+              break;
+            }
+          }
+          if (!isValid) break;
+        }
+        if (!isValid) break;
+      }
+      if (isValid) {
+        returnList.add(puzzleList);
       }
     }
-
-  }
-
-  public static boolean lookUpNextCorrectNumber(Integer firstNumber, Integer secondNumber) {
-    return (firstNumber < secondNumber);
+    return returnList;
   }
 }
+
