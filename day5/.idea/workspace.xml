@@ -58,20 +58,11 @@
       <workItem from="1734259407005" duration="5000" />
       <workItem from="1734259556113" duration="92000" />
       <workItem from="1734259732554" duration="2647000" />
-      <workItem from="1734264280571" duration="21735000" />
+      <workItem from="1734264280571" duration="30594000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="XDebuggerManager">
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="innerlist.size()" />
-        <watch expression="innerlist.size() -1)" />
-        <watch expression="innerlist.size() -1" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>

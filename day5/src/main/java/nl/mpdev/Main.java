@@ -7,49 +7,34 @@ import java.util.*;
 public class Main {
 
   public static void main(String[] args) {
-
     File orderingPuzzle = new File("./ordering-puzzle.txt");
     File puzzle = new File("./puzzle.txt");
-    int finalResult = 0;
 
-    // Make a hashmap out of ordering list
-    // Split out ordering-puzzle and add to the hashmap
-//    printOutArray(creatOrderingArr(orderingPuzzle, "\\|"));
-    var test1 = creatOrderingArr(orderingPuzzle, "\\|");
-    var test2 = creatOrderingArr(puzzle, ",");
-    // Create a list of list of every number inside the puzzle
-//    printOutArray(creatOrderingArr(puzzle, ","));
-    //  Make the first function to follow the logic of puzzle and filter them itno a new list
+    var filterRules = createOrderingArr(orderingPuzzle, "\\|");
+    var puzzleData = createOrderingArr(puzzle, ",");
 
-    var results = filterArray(test1, test2);
+    var results = filterArrays(filterRules, puzzleData, false);
 
-    for (List<Integer> result : results) {
-      int middleIndex = result.size() / 2; // Calculate the middle index
+    System.out.println("Already Valid Arrays:");
+    results.get("validArrays").forEach(System.out::println);
 
-      if (result.size() % 2 == 0) {
-        // If even size, return the average of the two middle numbers
-        var add = result.get(middleIndex - 1) + result.get(middleIndex) / 2;
-        finalResult += add;
-      }
-      else {
-        // If odd size, return the middle element
-        var add = result.get(middleIndex);
-        finalResult += add;
-      }
-    }
-    System.out.println(finalResult);
+    System.out.println("Invalid and Fixed Arrays:");
+    results.get("invalidAndFixedArrays").forEach(System.out::println);
 
-    // Create a function to get the the middle of each of this result and add them to an output variable
+    System.out.println("Original Invalid Arrays:");
+    results.get("invalidOriginalArrays").forEach(System.out::println);
 
+    System.out.println("Sum of Middle Numbers (Invalid and Fixed Arrays:):");
+    System.out.println(addMiddleNumbersToEachOther(results.get("invalidAndFixedArrays")));
   }
 
-  public static List<List<Integer>> creatOrderingArr(File orderingPuzzle, String character) {
+  public static List<List<Integer>> createOrderingArr(File orderingPuzzle, String delimiter) {
     List<List<Integer>> completeList = new ArrayList<>();
     try {
       Scanner scanner = new Scanner(orderingPuzzle);
       while (scanner.hasNextLine()) {
         String input = scanner.nextLine();
-        String[] parts = input.split(character);
+        String[] parts = input.split(delimiter);
         List<Integer> numbers = new ArrayList<>();
         for (String part : parts) {
           numbers.add(Integer.valueOf(part));
@@ -62,41 +47,93 @@ public class Main {
     return completeList;
   }
 
-  public static void printOutArray(List<List<Integer>> arr) {
-    for (List<Integer> innerList : arr) {
-      for (Integer number : innerList) {
-        System.out.print(number + " ");
+  public static Map<String, List<List<Integer>>> filterArrays(List<List<Integer>> filterPuzzle, List<List<Integer>> puzzle, boolean onlyValidArrays) {
+    List<List<Integer>> alreadyValidArrays = new ArrayList<>();
+    List<List<Integer>> invalidAndFixedArrays = new ArrayList<>();
+    List<List<Integer>> invalidOriginalArrays = new ArrayList<>();
+
+    for (List<Integer> puzzleList : puzzle) {
+      boolean isValid = splitOpenArray(filterPuzzle, puzzleList, true);
+      if (isValid) {
+        alreadyValidArrays.add(new ArrayList<>(puzzleList));
+      } else {
+        invalidOriginalArrays.add(new ArrayList<>(puzzleList));
+        List<Integer> fixedList = fixInvalidArray(filterPuzzle, puzzleList);
+        invalidAndFixedArrays.add(fixedList);
       }
-      System.out.println();
+    }
+
+    if (onlyValidArrays) {
+      return Map.of("validArrays", alreadyValidArrays);
+    } else {
+      return Map.of(
+        "validArrays", alreadyValidArrays,
+        "invalidAndFixedArrays", invalidAndFixedArrays,
+        "invalidOriginalArrays", invalidOriginalArrays
+      );
     }
   }
 
-  public static List<List<Integer>> filterArray(List<List<Integer>> filterPuzzle, List<List<Integer>> puzzle) {
-    List<List<Integer>> returnList = new ArrayList<>();
-    for (List<Integer> puzzleList : puzzle) {
-      boolean isValid = true;
-      for (int i = 0; i < puzzleList.size() - 1; i++) {
-        int count = 0;
-        var nextNumber = puzzleList.get(i + 1);
-        for (List<Integer> rules : filterPuzzle) {
-          for (int j = 0; j < rules.size(); j += 2) {
-            if (Objects.equals(puzzleList.get(i), rules.get(j)) && Objects.equals(nextNumber, rules.get(j + 1))) {
-              continue;
-            }
-            if (Objects.equals(puzzleList.get(i), rules.get(j + 1)) && Objects.equals(nextNumber, rules.get(j))) {
-              isValid = false;
-              break;
-            }
+  private static List<Integer> fixInvalidArray(List<List<Integer>> filterPuzzle, List<Integer> puzzleList) {
+    boolean isValid = splitOpenArray(filterPuzzle, puzzleList, true);
+    if (isValid) {
+      return puzzleList;
+    }
+
+    for (int i = 0; i < puzzleList.size() - 1; i++) {
+      var nextNumber = puzzleList.get(i + 1);
+      for (List<Integer> rules : filterPuzzle) {
+        for (int j = 0; j < rules.size(); j += 2) {
+          if (Objects.equals(puzzleList.get(i), rules.get(j + 1)) && Objects.equals(nextNumber, rules.get(j))) {
+            int temp = puzzleList.get(i);
+            puzzleList.set(i, nextNumber);
+            puzzleList.set(i + 1, temp);
+            return fixInvalidArray(filterPuzzle, puzzleList);
           }
-          if (!isValid) break;
         }
+      }
+    }
+    return puzzleList;
+  }
+
+  private static boolean splitOpenArray(List<List<Integer>> filterPuzzle, List<Integer> puzzleList, boolean isValid) {
+    for (int i = 0; i < puzzleList.size() - 1; i++) {
+      var nextNumber = puzzleList.get(i + 1);
+      for (List<Integer> rules : filterPuzzle) {
+        isValid = comparePuzzleWithRules(puzzleList, isValid, rules, i, nextNumber);
         if (!isValid) break;
       }
-      if (isValid) {
-        returnList.add(puzzleList);
+      if (!isValid) break;
+    }
+    return isValid;
+  }
+
+  private static boolean comparePuzzleWithRules(List<Integer> puzzleList, boolean isValid, List<Integer> rules, int i, Integer nextNumber) {
+    for (int j = 0; j < rules.size(); j += 2) {
+      if (Objects.equals(puzzleList.get(i), rules.get(j)) && Objects.equals(nextNumber, rules.get(j + 1))) {
+        continue;
+      }
+      if (Objects.equals(puzzleList.get(i), rules.get(j + 1)) && Objects.equals(nextNumber, rules.get(j))) {
+        isValid = false;
+        break;
       }
     }
-    return returnList;
+    return isValid;
+  }
+
+  private static int addMiddleNumbersToEachOther(List<List<Integer>> results) {
+    int finalResult = 0;
+    for (List<Integer> result : results) {
+      int middleIndex = result.size() / 2;
+
+      if (result.size() % 2 == 0) {
+        int add = result.get(middleIndex - 1) + result.get(middleIndex) / 2;
+        finalResult += add;
+      } else {
+        int add = result.get(middleIndex);
+        finalResult += add;
+      }
+    }
+    return finalResult;
   }
 }
-
