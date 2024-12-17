@@ -8,6 +8,8 @@ public class Main {
   public static void main(String[] args) {
 
     File puzzle = new File("./puzzle.txt");
+    int horizontalSize = getHorizontalSize(puzzle);
+    int verticalSize = getVerticalSize(puzzle);
     Map<List<Integer>, String> test = createGridOfAllValues(puzzle);
     List<Integer> startLocation = new ArrayList<>();
     String direction = "up";
@@ -18,59 +20,96 @@ public class Main {
         startLocation.add(key.getLast());
       }
     });
-
     System.out.println(startLocation);
+
+    System.out.println(test.get(List.of(100,0)));
 
     boolean endPuzzle = false;
     while (!endPuzzle) {
       if (direction.equals("up")) {
-        for (int i = startLocation.getFirst(); i >= 0; i--) {
-          System.out.println(test.get(List.of(i, startLocation.getLast())));
-          if (test.get(List.of(i, startLocation.getLast())).equals("#")) {
-            System.out.println("Found it! Stopped at  " + startLocation);
-            startLocation.set(1, startLocation.getLast() + 1);
+        for (int i = startLocation.getFirst(); i >= -1; i--) {
+          if (test.get(List.of(i, startLocation.getLast())) == null || test.get(List.of(i, startLocation.getLast())).equals("0")) {
+            endPuzzle = true;
+            System.out.println("Exit at " + startLocation);
             break;
           }
-          startLocation.set(0, i);
-          startLocation.set(1, startLocation.getLast());
+//          System.out.println(test.get(List.of(i, startLocation.getLast())));
+          if (test.get(List.of(i, startLocation.getLast())).equals("#")) {
+            System.out.println("Found it! Stopped at  " + startLocation);
+            break;
+          }
+          test.replace(List.of(i, startLocation.getLast()), "X");
+          System.out.println(test.get(List.of(i, startLocation.getLast())));
+          startLocation.set(0, i); // Replace location with moved position
         }
         direction = "right";
       }
       else if (direction.equals("right")) {
-        for (int i = (startLocation.getLast()); i <= getHorizontalSize(puzzle) ; i++) {
-          System.out.println(test.get(List.of(startLocation.getFirst(), i)));
-          if (test.get(List.of(startLocation.getFirst(), i)).equals("#")) {
-            startLocation.set(1, startLocation.getLast() + 1);
-            System.out.println("Found it! Stopped at  " + startLocation);
-            startLocation.set(1, startLocation.getFirst() + 1);
+        for (int i = (startLocation.getLast()); i <= horizontalSize; i++) {
+          if (test.get(List.of(startLocation.getFirst(), i)) == null || test.get(List.of(startLocation.getFirst(), i)).equals("0")) {
+            endPuzzle = true;
+            System.out.println("Exit at " + startLocation);
             break;
           }
-          startLocation.set(0, startLocation.getFirst());
+//          System.out.println(test.get(List.of(startLocation.getFirst(), i)));
+          if (test.get(List.of(startLocation.getFirst(), i)).equals("#")) {
+            System.out.println("Found it! Stopped at  " + startLocation);
+            break;
+          }
+          test.replace(List.of(startLocation.getFirst(), i), "X");
+//          System.out.println(test.get(List.of(startLocation.getFirst(), i)));
           startLocation.set(1, i);
         }
         direction = "bottom";
-        endPuzzle = true;
       }
-//      else if (direction.equals("bottom")) {
-//        for (int i = (startLocation.getLast()); i <= getHorizontalSize(puzzle) ; i++) {
+      else if (direction.equals("bottom")) {
+        for (int i = (startLocation.getFirst()); i <= verticalSize; i++) {
+          if (test.get(List.of(i, startLocation.getLast())) == null || test.get(List.of(i, startLocation.getLast())).equals("0")) {
+            endPuzzle = true;
+            System.out.println("Exit at " + startLocation);
+            break;
+          }
+//          System.out.println(test.get(List.of(i, startLocation.getLast())));
+          if (test.get(List.of(i, startLocation.getLast())).equals("#")) {
+            System.out.println("Found it! Stopped at  " + startLocation);
+            break;
+          }
+          test.replace(List.of(i, startLocation.getLast()), "X");
+//          System.out.println(test.get(List.of(i, startLocation.getLast())));
+          startLocation.set(0, i);
+        }
+        direction = "left";
+
+      }
+      else if (direction.equals("left")) {
+        for (int i = (startLocation.getLast()); i >= -1; i--) {
+          if(startLocation.getLast().equals(0)) {
+            System.out.println("show me");
+          }
+          if (test.get(List.of(startLocation.getFirst(), i)) == null || test.get(List.of(startLocation.getFirst(), i)).equals("0")) {
+            endPuzzle = true;
+            System.out.println("Exit at " + startLocation);
+            break;
+          }
 //          System.out.println(test.get(List.of(startLocation.getFirst(), i)));
-//          if (test.get(List.of(startLocation.getFirst(), i)).equals("#")) {
-//            startLocation.set(1, startLocation.getLast() + 1);
-//            System.out.println("Found it! Stopped at  " + startLocation);
-//            break;
-//          }
-//          startLocation.set(0, startLocation.getFirst());
-//          startLocation.set(1, i);
-//        }
-//        direction = "bottom";
+          if (test.get(List.of(startLocation.getFirst(), i)).equals("#")) {
+            System.out.println("Found it! Stopped at  " + startLocation);
+            break;
+          }
+          test.replace(List.of(startLocation.getFirst(), i), "X");
+//          System.out.println(test.get(List.of(startLocation.getFirst(), i)));
+          startLocation.set(1, i);
+        }
+        direction = "up";
       }
     }
-
-    // Locate all obstacles
-
-    // Create a grid
-    // Perhaps with hasmap where the cooordinates are used as a key
-    // It could look like this (1,1 = .)
+    int countX = 0;
+    for (Map.Entry<List<Integer>, String> entry : test.entrySet()) {
+      if (entry.getValue().equals("X")) {
+        countX++;
+      }
+    }
+    System.out.println(countX);
 
   }
 
@@ -106,4 +145,21 @@ public class Main {
     }
     return 0;
   }
+
+  public static int getVerticalSize(File puzzle) {
+    int lineCounter = 0;
+    try {
+      Scanner scanner = new Scanner(puzzle);
+      while (scanner.hasNextLine()) {
+        scanner.nextLine();
+        lineCounter++;
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    return lineCounter;
+  }
+
 }
+
+

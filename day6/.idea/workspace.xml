@@ -27,6 +27,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
+    "Application.PuzzleSolver.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "day6",
     "kotlin-language-version-configured": "true",
@@ -35,7 +36,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "settings.editor.selected.configurable": "editor.preferences.folding",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -58,7 +59,9 @@
       <workItem from="1721391834071" duration="311000" />
       <workItem from="1734331284857" duration="117000" />
       <workItem from="1734331945590" duration="274000" />
-      <workItem from="1734335511467" duration="16232000" />
+      <workItem from="1734335511467" duration="18459000" />
+      <workItem from="1734364099247" duration="14427000" />
+      <workItem from="1734431258150" duration="7620000" />
     </task>
     <servers />
   </component>
@@ -68,13 +71,7 @@
   <component name="XDebuggerManager">
     <watches-manager>
       <configuration name="Application">
-        <watch expression="test" />
-        <watch expression="startLocation.get(i)" />
-        <watch expression="startLocation.getLast()" />
-        <watch expression="test.get(i)" />
-        <watch expression="startLocation.getFirst() -2" language="JAVA" />
-        <watch expression="startLocation.getFirst()" />
-        <watch expression="getHorizontalSize(puzzle)" />
+        <watch expression="test.get(List.of(i, startLocation.getLast()))" />
       </configuration>
     </watches-manager>
   </component>
