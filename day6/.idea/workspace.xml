@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4cd1449-94b7-4ebf-b6a3-acb3b969afb5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../day5/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../day5/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="e4cd1449-94b7-4ebf-b6a3-acb3b969afb5" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -62,6 +60,7 @@
       <workItem from="1734335511467" duration="18459000" />
       <workItem from="1734364099247" duration="14427000" />
       <workItem from="1734431258150" duration="7620000" />
+      <workItem from="1734507615416" duration="13668000" />
     </task>
     <servers />
   </component>
@@ -69,9 +68,19 @@
     <option name="version" value="3" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/nl/mpdev/Main.java</url>
+          <line>25</line>
+          <option name="timeStamp" value="99" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="test.get(List.of(i, startLocation.getLast()))" />
+        <watch expression="grid.get(currentPosition)" />
       </configuration>
     </watches-manager>
   </component>
