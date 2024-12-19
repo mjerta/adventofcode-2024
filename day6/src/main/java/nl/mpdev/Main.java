@@ -12,29 +12,14 @@ public class Main {
     File puzzle = new File("./puzzle.txt");
     int horizontalSize = getHorizontalSize(puzzle);
     int verticalSize = getVerticalSize(puzzle);
+    List<Integer> startLocation = new ArrayList<>();
+    Set<List<Integer>> visitedLocations = new HashSet<>(); // Used later to get total ammount of visit locations
+
     Map<List<Integer>, String> grid = createGridOfAllValues(puzzle);
+    lookUpFirstStartLocation(startLocation, grid);
 
-
-    for (Map.Entry<List<Integer>, String> entry : grid.entrySet()) {
-      String originalValue = entry.getValue();
-      grid = createGridOfAllValues(puzzle);
-      List<Integer> startLocation = new ArrayList<>();
-      lookUpFirstStartLocation(startLocation, grid);
-      Set<List<Integer>> visitedLocations = new HashSet<>();
-      String startingDirection = "up";
-      System.out.println(entry.getKey().getFirst());
-      List<Integer> key = entry.getKey();
-      walkThePuzzle(startingDirection, startLocation, grid, horizontalSize, verticalSize, visitedLocations);
-      if (grid.get(entry.getKey()).equals("X")) {
-        grid.replace(key, "#");
-        System.out.println("Obstacle is placed on :" + key);
-      }
-      walkThePuzzle(startingDirection, startLocation, grid, horizontalSize, verticalSize, visitedLocations);
-      if (key != startLocation) {
-        grid.replace(key, originalValue);
-      }
-    }
-    getAmmountOfWalkedPositions(grid);
+    walkThePuzzle("up", startLocation, grid, horizontalSize, verticalSize, visitedLocations);
+    System.out.println(visitedLocations.size());
   }
 
   private static void walkThePuzzle(String direction, List<Integer> startLocation, Map<List<Integer>, String> grid, int horizontalSize,
@@ -44,176 +29,101 @@ public class Main {
     while (!endPuzzle) {
       switch (direction) {
         case "up":
-          endPuzzle = walkUp(startLocation, grid, endPuzzle, visitedLocations);
+          for (int i = startLocation.getFirst(); i >= -1; i--) {
+            List<Integer> currentPosition = List.of(i, startLocation.getLast());
+            if (shouldTerminate(grid, currentPosition, startLocation, endPuzzle)) {
+              endPuzzle = true;
+              break;
+            }
+            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, false, i, visitedLocations)) {
+              break;
+            }
+          }
           direction = "right";
           break;
         case "right":
-          endPuzzle = walkRight(startLocation, horizontalSize, grid, endPuzzle, visitedLocations);
+          for (int i = (startLocation.getLast()); i <= horizontalSize; i++) {
+            List<Integer> currentPosition = List.of(startLocation.getFirst(), i);
+            if (shouldTerminate(grid, currentPosition, startLocation, endPuzzle)) {
+              endPuzzle = true;
+              break;
+            }
+            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, true, i, visitedLocations)) {
+              break;
+            }
+          }
           direction = "down";
           break;
         case "down":
-          endPuzzle = walkDown(startLocation, verticalSize, grid, endPuzzle, visitedLocations);
+          for (int i = (startLocation.getFirst()); i <= verticalSize; i++) {
+            List<Integer> currentPosition = List.of(i, startLocation.getLast());
+            if (shouldTerminate(grid, currentPosition, startLocation, endPuzzle)) {
+              endPuzzle = true;
+              break;
+            }
+            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, false, i, visitedLocations)) {
+              break;
+            }
+
+          }
           direction = "left";
           break;
         case "left":
-          endPuzzle = walkLeft(startLocation, grid, endPuzzle, visitedLocations);
+          for (int i = (startLocation.getLast()); i >= -1; i--) {
+            List<Integer> currentPosition = List.of(startLocation.getFirst(), i);
+            if (shouldTerminate(grid, currentPosition, startLocation, endPuzzle)) {
+              endPuzzle = true;
+              break;
+            }
+            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, true, i, visitedLocations)) {
+              break;
+            }
+          }
           direction = "up";
           break;
       }
     }
   }
 
-  private static void getAmmountOfWalkedPositions(Map<List<Integer>, String> grid) {
-    int countX = 0;
-    for (Map.Entry<List<Integer>, String> entry : grid.entrySet()) {
-      if (entry.getValue().equals("X")) {
-        countX++;
-      }
+  private static boolean lookingForObstacle(List<Integer> startLocation, Map<List<Integer>, String> grid, boolean endPuzzle,
+                                            List<Integer> currentPosition, boolean isHorizontal, int i,
+                                            Set<List<Integer>> visitedLocations) {
+    if (grid.get(currentPosition).equals("#")) {
+      System.out.println("Found it! Stopped at  " + startLocation);
+      return true;
     }
-    System.out.println(countX);
+    if(visitedLocations.isEmpty()) {
+      System.out.println("already have");
+    }
+    grid.replace(currentPosition, "X");
+    updateLocationBasedOnAxis(startLocation, isHorizontal, i);
+    return false;
   }
 
-  private static boolean walkLeft(List<Integer> startLocation, Map<List<Integer>, String> grid, boolean endPuzzle,
-                                  Set<List<Integer>> visitedLocations) {
-    int previousRow = startLocation.get(1);
-    List<Integer> currentPosition = List.of();
-    for (int i = (startLocation.getLast()); i >= -1; i--) {
-      currentPosition = List.of(startLocation.getFirst(), i);
-//      if (startLocation.getLast().equals(0)) {
-//        System.out.println("show me");
-//      }
-      if (grid.get(currentPosition) == null || grid.get(currentPosition).equals("0")) {
-        endPuzzle = true;
-//        System.out.println("Exit at " + startLocation);
-        break;
-      }
-      if (grid.get(currentPosition).equals("#")) {
-//        System.out.println("Found it! Stopped at  " + startLocation);
-        if (!visitedLocations.add(List.of(startLocation.getFirst(), startLocation.getLast()))) {
-//          int difference = Math.abs(previousRow - i); // Calculate the row difference
-//          if (difference == 1 || difference == 0) { // If the difference is exactly one step
-//            System.out.println("Found a match at " + currentPosition + " with a difference of 1 from the previous row.");
-//            return true;
-//          }
-//          else {
-//            System.out.println("Found a match at " + currentPosition + " but difference is " + difference);
-//          }
-          System.out.println("Found duplicate");
-          return true;
-        }
-        break;
-      }
-      grid.replace(currentPosition, "X");
-      startLocation.set(1, i);
+  private static boolean shouldTerminate(Map<List<Integer>, String> grid, List<Integer> currentPosition, List<Integer> startLocation,
+                                         boolean endPuzzle) {
+    if (canExitTheGrid(grid, currentPosition)) {
+      System.out.println("Exit at " + startLocation);
+      return true;
     }
-    return endPuzzle;
+    return false;
   }
 
-  private static boolean walkDown(List<Integer> startLocation, int verticalSize, Map<List<Integer>, String> grid, boolean endPuzzle,
-                                  Set<List<Integer>> visitedLocations) {
-    int previousRow = startLocation.get(0);
-    List<Integer> currentPosition = List.of();
-    for (int i = (startLocation.getFirst()); i <= verticalSize; i++) {
-      currentPosition = List.of(i, startLocation.getLast());
-      if (grid.get(currentPosition) == null || grid.get(currentPosition).equals("0")) {
-        endPuzzle = true;
-//        System.out.println("Exit at " + startLocation);
-        break;
-      }
-      if (grid.get(currentPosition).equals("#")) {
-//        System.out.println("Found it! Stopped at  " + startLocation);
-        if (!visitedLocations.add(List.of(startLocation.getFirst(), startLocation.getLast()))) {
-//          int difference = Math.abs(previousRow - i); // Calculate the row difference
-//          if (difference == 1 || difference == 0) { // If the difference is exactly one step
-//            System.out.println("Found a match at " + currentPosition + " with a difference of 1 from the previous row.");
-//            return true;
-//          }
-//          else {
-//            System.out.println("Found a match at " + currentPosition + " but difference is " + difference);
-//          }
-          System.out.println("Found duplicate");
-          return true;
-        }
-        break;
-      }
-      grid.replace(currentPosition, "X");
-      startLocation.set(0, i);
+  private static void updateLocationBasedOnAxis(List<Integer> startLocation, boolean isHorizontal, int i) {
+    if (!isHorizontal) {
+      startLocation.set(0, i); // Update start location
     }
-    return endPuzzle;
+    else {
+      startLocation.set(1, i); // Update start location
+    }
   }
 
-  private static boolean walkRight(List<Integer> startLocation, int horizontalSize, Map<List<Integer>, String> grid, boolean endPuzzle,
-                                   Set<List<Integer>> visitedLocations) {
-    int previousRow = startLocation.get(1);
-    List<Integer> currentPosition = List.of();
-    for (int i = (startLocation.getLast()); i <= horizontalSize; i++) {
-      currentPosition = List.of(startLocation.getFirst(), i);
-      if (grid.get(currentPosition) == null || grid.get(currentPosition).equals("0")) {
-        endPuzzle = true;
-//        System.out.println("Exit at " + startLocation);
-        break;
-      }
-      if (grid.get(currentPosition).equals("#")) {
-//        System.out.println("Found it! Stopped at  " + startLocation);
-        if (!visitedLocations.add(List.of(startLocation.getFirst(), startLocation.getLast()))) {
-//          int difference = Math.abs(previousRow - i); // Calculate the row difference
-//          if (difference == 1 || difference == 0) { // If the difference is exactly one step
-//            System.out.println("Found a match at " + currentPosition + " with a difference of 1 from the previous row.");
-//            return true;
-//          }
-//          else {
-//            System.out.println("Found a match at " + currentPosition + " but difference is " + difference);
-//          }
-          System.out.println("Found duplicate");
-          return true;
-        }
-        break;
-      }
-      grid.replace(currentPosition, "X");
-      startLocation.set(1, i);
-    }
-    return endPuzzle;
-  }
-
-  private static boolean walkUp(List<Integer> startLocation, Map<List<Integer>, String> grid, boolean endPuzzle,
-                                Set<List<Integer>> visitedLocations) {
-    int previousRow = startLocation.get(0);
-    List<Integer> currentPosition = List.of();
-    for (int i = startLocation.getFirst(); i >= -1; i--) {
-      currentPosition = List.of(i, startLocation.getLast());
-      if (grid.get(currentPosition) == null || grid.get(currentPosition).equals("0")) {
-        endPuzzle = true;
-//        System.out.println("Exit at " + startLocation);
-        break;
-      }
-      var valueCurrentPosition = grid.get(currentPosition);
-      if (grid.get(currentPosition).equals("#")) {
-
-//        System.out.println("Found it! Stopped at  " + startLocation);
-        // get previous key to comapere and if they are the same return true.
-        if (!visitedLocations.add(List.of(startLocation.getFirst(), startLocation.getLast()))) {
-//          int difference = Math.abs(previousRow - i); // Calculate the row difference
-//          if (difference == 1 || difference == 0) { // If the difference is exactly one step
-//            System.out.println("Found a match at " + currentPosition + " with a difference of 1 from the previous row.");
-//            return true;
-//          }
-//          else {
-//            System.out.println("Found a match at " + currentPosition + " but difference is " + difference);
-//          }
-          System.out.println("Found duplicate");
-          return true;
-        }
-        break;
-      }
-      grid.replace(currentPosition, "X");
-      startLocation.set(0, i); // Replace location with moved position
-    }
-    return endPuzzle;
+  private static boolean canExitTheGrid(Map<List<Integer>, String> grid, List<Integer> currentPosition) {
+    return grid.get(currentPosition) == null || grid.get(currentPosition).equals("0");
   }
 
   private static void lookUpFirstStartLocation(List startLocation, Map<List<Integer>, String> grid) {
     grid.forEach((key, value) -> {
-
       if (value.equals("^")) {
         startLocation.add(key.getFirst());
         startLocation.add(key.getLast());
@@ -234,7 +144,6 @@ public class Main {
         }
         indexOfLine++;
       }
-
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -267,7 +176,6 @@ public class Main {
     }
     return lineCounter;
   }
-
 }
 
 
