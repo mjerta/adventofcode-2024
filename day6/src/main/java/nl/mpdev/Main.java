@@ -6,6 +6,7 @@ import java.util.*;
 
 public class Main {
   static int countDuplicates = 0;
+  static Set<List<Integer>> infiniteLoops = new HashSet<>();
 
   public static void main(String[] args) {
 
@@ -13,21 +14,41 @@ public class Main {
     int horizontalSize = getHorizontalSize(puzzle);
     int verticalSize = getVerticalSize(puzzle);
     List<Integer> startLocation = new ArrayList<>();
-    Set<List<Integer>> visitedLocations = new HashSet<>(); // Used later to get total ammount of visit locations
+    Set<List<Integer>> visitedLocations = new LinkedHashSet<>(); // Used later to get total ammount of visit locations
 
     Map<List<Integer>, String> grid = createGridOfAllValues(puzzle);
     lookUpFirstStartLocation(startLocation, grid);
 
-    walkThePuzzle("up", startLocation, grid, horizontalSize, verticalSize, visitedLocations);
-    System.out.println(visitedLocations.size());
+    walkThePuzzle("up", startLocation, grid, horizontalSize, verticalSize, visitedLocations, false);
+    System.out.println("Ammount of steps it takes to get out of part 1 of the puzzle: " + visitedLocations.size());
+
+    // walk the puzzle again but based on the path that is already been walked
+    List<Integer> copyStartLocation = new ArrayList<>();
+    grid = createGridOfAllValues(puzzle);
+    lookUpFirstStartLocation(copyStartLocation, grid);
+    List<Integer> immutableList = Collections.unmodifiableList(new ArrayList<>(copyStartLocation));
+    for (List<Integer> visitedLocation : new LinkedHashSet<>(visitedLocations)) {
+      if (visitedLocation.equals(immutableList)) {
+        continue;
+      }
+      var originalValue = grid.get(visitedLocation);
+      grid.replace(visitedLocation, "O");
+      walkThePuzzle("up", immutableList, grid, horizontalSize, verticalSize, visitedLocations, true);
+      grid.replace(visitedLocation, originalValue);
+    }
+    System.out.println("The ammount of infinite loops it cause to place an obstacle on the path that is provided from part 1: " +  countDuplicates);
   }
 
-  private static void walkThePuzzle(String direction, List<Integer> startLocation, Map<List<Integer>, String> grid, int horizontalSize,
-                                    int verticalSize, Set<List<Integer>> visitedLocations) {
+  private static void walkThePuzzle(String direction, List<Integer> incomingStartLocation, Map<List<Integer>, String> grid,
+                                    int horizontalSize,
+                                    int verticalSize, Set<List<Integer>> visitedLocations, boolean checkForInfiniteLoops) {
 
+    List<Integer> startLocation = new ArrayList<>(incomingStartLocation);
+    infiniteLoops.clear();
     boolean endPuzzle = false;
     while (!endPuzzle) {
       switch (direction) {
+
         case "up":
           for (int i = startLocation.getFirst(); i >= -1; i--) {
             List<Integer> currentPosition = List.of(i, startLocation.getLast());
@@ -35,7 +56,7 @@ public class Main {
               endPuzzle = true;
               break;
             }
-            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, false, i, visitedLocations)) {
+            if (lookingForObstacle(startLocation, grid, currentPosition, false, i, visitedLocations, checkForInfiniteLoops)) {
               break;
             }
           }
@@ -48,7 +69,7 @@ public class Main {
               endPuzzle = true;
               break;
             }
-            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, true, i, visitedLocations)) {
+            if (lookingForObstacle(startLocation, grid, currentPosition, true, i, visitedLocations, checkForInfiniteLoops)) {
               break;
             }
           }
@@ -61,10 +82,9 @@ public class Main {
               endPuzzle = true;
               break;
             }
-            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, false, i, visitedLocations)) {
+            if (lookingForObstacle(startLocation, grid, currentPosition, false, i, visitedLocations, checkForInfiniteLoops)) {
               break;
             }
-
           }
           direction = "left";
           break;
@@ -75,7 +95,13 @@ public class Main {
               endPuzzle = true;
               break;
             }
-            if (lookingForObstacle(startLocation, grid, endPuzzle, currentPosition, true, i, visitedLocations)) {
+            if (lookingForObstacle(startLocation, grid, currentPosition, true, i, visitedLocations, checkForInfiniteLoops)) {
+              if (checkForInfiniteLoops) {
+                if (!infiniteLoops.add(currentPosition)) {
+                  endPuzzle = true;
+                  countDuplicates++;
+                }
+              }
               break;
             }
           }
@@ -85,25 +111,28 @@ public class Main {
     }
   }
 
-  private static boolean lookingForObstacle(List<Integer> startLocation, Map<List<Integer>, String> grid, boolean endPuzzle,
+  private static boolean lookingForObstacle(List<Integer> startLocation, Map<List<Integer>, String> grid,
                                             List<Integer> currentPosition, boolean isHorizontal, int i,
-                                            Set<List<Integer>> visitedLocations) {
-    if (grid.get(currentPosition).equals("#")) {
-      System.out.println("Found it! Stopped at  " + startLocation);
+                                            Set<List<Integer>> visitedLocations, boolean checkForInfiniteLoops) {
+    if (grid.get(currentPosition).equals("#") ||
+      grid.get(currentPosition).equals("O")) {
+//      System.out.println("Found it! Stopped at  " + startLocation);
       return true;
     }
-    if(visitedLocations.isEmpty()) {
-      System.out.println("already have");
+
+    if (!checkForInfiniteLoops) {
+      visitedLocations.add(currentPosition);
+      grid.replace(currentPosition, "X");
     }
-    grid.replace(currentPosition, "X");
     updateLocationBasedOnAxis(startLocation, isHorizontal, i);
     return false;
   }
 
-  private static boolean shouldTerminate(Map<List<Integer>, String> grid, List<Integer> currentPosition, List<Integer> startLocation,
-                                         boolean endPuzzle) {
+  private static boolean shouldTerminate
+    (Map<List<Integer>, String> grid, List<Integer> currentPosition, List<Integer> startLocation,
+     boolean endPuzzle) {
     if (canExitTheGrid(grid, currentPosition)) {
-      System.out.println("Exit at " + startLocation);
+//      System.out.println("Exit at " + startLocation);
       return true;
     }
     return false;
