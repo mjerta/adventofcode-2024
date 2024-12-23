@@ -36,7 +36,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.Main.executor": "Run",
+    "Application.Main.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "day7",
     "kotlin-language-version-configured": "true",
@@ -45,6 +45,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -86,7 +87,8 @@
       <updated>1721391832676</updated>
       <workItem from="1721391834071" duration="311000" />
       <workItem from="1734791259033" duration="1393000" />
-      <workItem from="1734856680465" duration="19079000" />
+      <workItem from="1734856680465" duration="23818000" />
+      <workItem from="1734948289677" duration="14988000" />
     </task>
     <servers />
   </component>
@@ -97,11 +99,28 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/nl/mpdev/Main.java</url>
+          <line>23</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/nl/mpdev/Line.java</url>
-          <line>62</line>
-          <option name="timeStamp" value="13" />
+          <line>70</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/nl/mpdev/Line.java</url>
+          <line>74</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="line.getResultsNumbersToCalculateFirstPart()" />
+        <watch expression="resultsNumbersToCalculateFirstPart" />
+        <watch expression="umbersToCalculate.get((int) currentIndex)" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
